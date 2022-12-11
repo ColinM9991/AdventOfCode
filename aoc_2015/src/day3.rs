@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashSet},
-    ops::Add,
-};
+use std::{collections::HashSet, ops::Add};
 
 #[derive(Clone)]
 enum Direction {
@@ -60,33 +57,16 @@ fn visit(instructions: &Vec<Direction>) -> Vec<Position> {
 
 fn visit_duo(instructions: &Vec<Direction>) -> Vec<Position> {
     let mut visited = vec![Position(0, 0)];
-    let mut santa_visited = vec![Position(0, 0)];
-    let mut robo_visited = vec![Position(0, 0)];
 
-    for (_, instruction) in instructions.iter().enumerate().filter(|(index, _)| index % 2 == 0) {
-        let instruction = Position::from(instruction);
-        let last = santa_visited.last().unwrap().clone();
-
-        let visit_position = last + instruction;
-
-        if !visited.contains(&visit_position) {
-            visited.push(visit_position);
-        }
-
-        santa_visited.push(visit_position);
-    }
-
-    for (_, instruction) in instructions.iter().enumerate().filter(|(index, _)| index % 2 == 1) {
-        let instruction = Position::from(instruction);
-        let last = robo_visited.last().unwrap().clone();
-
-        let visit_position = last + instruction;
-
-        if !visited.contains(&visit_position) {
-            visited.push(visit_position);
-        }
-
-        robo_visited.push(visit_position);
+    for direction in instructions {
+        let visited_length = visited.len();
+        let reference_pos = if visited_length < 3 {
+            Position(0, 0)
+        } else {
+            visited[visited_length - 2].clone()
+        };
+        
+        visited.push(reference_pos + Position::from(direction));
     }
 
     visited
@@ -110,10 +90,10 @@ fn solution_2(input: &str) -> usize {
         .lines()
         .flat_map(|line| line.chars().map(|char| Direction::from(char)))
         .collect::<Vec<_>>();
-        
+
     let visited = visit_duo(&instructions);
 
-    visited.into_iter().len()
+    visited.into_iter().collect::<HashSet<Position>>().len()
 }
 
 #[cfg(test)]
