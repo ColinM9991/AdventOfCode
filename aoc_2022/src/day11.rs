@@ -41,7 +41,10 @@ impl Monkey {
         }
     }
 
-    fn inspect_item(&mut self, should_divide: bool, lcm: u64) -> u64 {
+    fn inspect_item<F>(&mut self, f: &F) -> u64
+    where
+        F: Fn(u64) -> u64,
+    {
         self.inspections += 1;
         let gift = self.gifts.pop_front().unwrap();
 
@@ -56,11 +59,7 @@ impl Monkey {
             },
         };
 
-        gift %= lcm;
-
-        if should_divide {
-            gift /= 3;
-        }
+        gift = f(gift);
 
         gift
     }
@@ -161,17 +160,15 @@ fn parse_input(input: &str) -> Vec<Monkey> {
     monkeys
 }
 
-fn play_game(monkeys: &mut Vec<Monkey>, rounds: u32, should_divide: bool) -> u64 {
-    let lcm = monkeys
-        .iter()
-        .map(|monkey| monkey.test.value as u64)
-        .product::<u64>();
-
+fn play_game<F>(monkeys: &mut Vec<Monkey>, rounds: u32, f: F) -> u64
+where
+    F: Fn(u64) -> u64,
+{
     for _ in 1..=rounds {
         for index in 0..monkeys.len() {
             for _ in 0..monkeys[index].gifts.len() {
                 let monkey = monkeys.get_mut(index).unwrap();
-                let item = monkey.inspect_item(should_divide, lcm);
+                let item = monkey.inspect_item(&f);
 
                 let recipient_monkey_id = if item % (monkey.test.value as u64) == 0 {
                     monkey.test.true_target
@@ -197,7 +194,7 @@ fn play_game(monkeys: &mut Vec<Monkey>, rounds: u32, should_divide: bool) -> u64
 fn solution_1(input: &str) -> u64 {
     let mut monkeys = parse_input(input);
 
-    let result = play_game(&mut monkeys, 20, true);
+    let result = play_game(&mut monkeys, 20, |gift| gift / 3);
 
     result
 }
@@ -205,7 +202,12 @@ fn solution_1(input: &str) -> u64 {
 fn solution_2(input: &str) -> u64 {
     let mut monkeys = parse_input(input);
 
-    let result = play_game(&mut monkeys, 10000, false);
+    let lcm = monkeys
+        .iter()
+        .map(|monkey| monkey.test.value as u64)
+        .product::<u64>();
+
+    let result = play_game(&mut monkeys, 10000, |gift| gift % lcm);
 
     result
 }
