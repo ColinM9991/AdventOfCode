@@ -48,7 +48,7 @@ impl Monkey {
         self.inspections += 1;
         let gift = self.gifts.pop_front().unwrap();
 
-        let mut gift = match &self.operation {
+        let gift = match &self.operation {
             Operation::Add(val) => match val {
                 OperationValue::By(by) => gift + *by,
                 OperationValue::ByOriginal => gift + gift,
@@ -59,9 +59,7 @@ impl Monkey {
             },
         };
 
-        gift = f(gift);
-
-        gift
+        f(gift)
     }
 }
 
