@@ -63,6 +63,35 @@ impl Grid {
             end_pos: None,
         }
     }
+
+    fn edges(&self) -> Vec<&Position> {
+        let grid_size = self.positions.len();
+        let row_size = self.positions[0].len();
+
+        self.positions
+            .iter()
+            .enumerate()
+            .filter_map(|(index, set)| {
+                if index == 0 || index == grid_size - 1 {
+                    Some(set.into_iter().collect::<Vec<_>>())
+                } else {
+                    Some(
+                        set.into_iter()
+                            .enumerate()
+                            .filter_map(|(row_index, row_item)| {
+                                if row_index == 0 || row_index == row_size - 1 {
+                                    Some(row_item)
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect::<Vec<_>>(),
+                    )
+                }
+            })
+            .flatten()
+            .collect::<Vec<_>>()
+    }
 }
 
 fn parse_input(input: &str) -> Grid {
@@ -116,18 +145,25 @@ fn solution_1(input: &str) -> u32 {
 
 fn solution_2(input: &str) -> u32 {
     let grid = parse_input(input);
-    
-    let result = astar(
-        &grid.start_pos.unwrap(),
-        |p| p.neighbours(&grid.elevations),
-        |p| p.get_distance(&grid.end_pos.unwrap()),
-        |p| *p == grid.end_pos.unwrap(),
-    );
 
-    match result {
-        Some(val) => val.1,
-        None => 0,
-    }
+    grid.edges()
+        .into_iter()
+        .filter(|item| grid.elevations.get(&item) == Some(&LOWEST_ELEVATION))
+        .filter_map(|pos| {
+            let res = astar(
+                pos,
+                |p| p.neighbours(&grid.elevations),
+                |p| p.get_distance(&grid.end_pos.unwrap()),
+                |p| *p == grid.end_pos.unwrap(),
+            );
+
+            match res {
+                Some(val) => Some(val.1),
+                None => None,
+            }
+        })
+        .min()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -150,5 +186,23 @@ mod tests {
         let input = include_str!("input/day12.txt");
 
         assert_eq!(339, solution_1(input));
+    }
+
+    #[test]
+    fn solution_2_example() {
+        let input = "Sabqponm
+        abcryxxl
+        accszExk
+        acctuvwj
+        abdefghi";
+
+        assert_eq!(29, solution_2(input));
+    }
+
+    #[test]
+    fn solution_2_input() {
+        let input = include_str!("input/day12.txt");
+
+        assert_eq!(332, solution_2(input));
     }
 }
