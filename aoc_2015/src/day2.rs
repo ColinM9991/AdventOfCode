@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 struct Rectangle {
     length: u32,
     width: u32,
@@ -5,22 +7,24 @@ struct Rectangle {
 }
 
 impl Rectangle {
+    fn get_dimensions_windows(&self) -> impl Iterator<Item = (u32, u32)> {
+        [self.length, self.width, self.height]
+            .into_iter()
+            .circular_tuple_windows()
+    }
+
     fn get_paper_dimensions(&self) -> u32 {
-        (2 * self.length * self.width)
-            + (2 * self.width * self.height)
-            + (2 * self.height * self.length)
+        self.get_dimensions_windows()
+            .map(|(l, r)| 2 * l * r)
+            .sum::<u32>()
             + self.get_smallest_area()
     }
 
     fn get_smallest_area(&self) -> u32 {
-        [
-            self.length * self.width,
-            self.width * self.height,
-            self.height * self.length,
-        ]
-        .into_iter()
-        .min()
-        .unwrap()
+        self.get_dimensions_windows()
+            .map(|(l, r)| l * r)
+            .min()
+            .unwrap()
     }
 
     fn get_ribbon_length(&self) -> u32 {
