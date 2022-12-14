@@ -25,27 +25,27 @@ fn solution_2(input: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn solution_1_example() {
-    //     assert_eq!(609043, solution_1("abcdef"));
-    //     assert_eq!(1048970, solution_1("pqrstuv"));
-    // }
+    #[test]
+    fn solution_1_example() {
+        assert_eq!(609043, solution_1("abcdef"));
+        assert_eq!(1048970, solution_1("pqrstuv"));
+    }
 
-    // #[test]
-    // fn solution_1_input() {
-    //     assert_eq!(282749, solution_1("yzbqklnj"));
-    // }
+    #[test]
+    fn solution_1_input() {
+        assert_eq!(282749, solution_1("yzbqklnj"));
+    }
 
-    // #[test]
-    // fn solution_2_example() {
-    //     assert_eq!(609043, solution_2("abcdef"));
-    //     assert_eq!(1048970, solution_2("pqrstuv"));
-    // }
+    #[test]
+    fn solution_2_example() {
+        assert_eq!(6742839, solution_2("abcdef"));
+        assert_eq!(5714438, solution_2("pqrstuv"));
+    }
 
-    // #[test]
-    // fn solution_2_input() {
-    //     assert_eq!(9962624, solution_2("yzbqklnj"));
-    // }
+    #[test]
+    fn solution_2_input() {
+        assert_eq!(9962624, solution_2("yzbqklnj"));
+    }
 }

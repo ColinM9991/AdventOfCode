@@ -1,3 +1,22 @@
+use nom::{
+    character::complete::{line_ending, newline},
+    combinator::map,
+    multi::separated_list1,
+    sequence::pair,
+    IResult,
+};
+
+fn parse_group(input: &str) -> IResult<&str, u32> {
+    map(
+        separated_list1(newline, nom::character::complete::u32),
+        |val| val.into_iter().sum(),
+    )(input)
+}
+
+fn parse_whole(input: &str) -> IResult<&str, Vec<u32>> {
+    separated_list1(pair(line_ending, line_ending), parse_group)(input)
+}
+
 fn solution_1(input: &str) -> Option<u32> {
     get_calories(input).max()
 }
@@ -11,15 +30,9 @@ fn solution_2(input: &str) -> u32 {
 }
 
 fn get_calories(input: &str) -> impl Iterator<Item = u32> + '_ {
-    input
-        .trim()
-        .split("\n\n")
-        .map(|group| {
-            group
-                .lines()
-                .filter_map(|line| line.trim().parse::<u32>().ok())
-                .sum::<u32>()
-        })
+    let (_, result) = parse_whole(input).unwrap();
+
+    result.into_iter()
 }
 
 #[cfg(test)]
