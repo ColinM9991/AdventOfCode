@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
     input
         .lines()
@@ -31,11 +33,17 @@ fn solution_1(input: &str) -> u32 {
 
 fn solution_2(input: &str) -> u32 {
     let parsed_input = parse_input(input);
-    let left = &parsed_input.0;
-    let right = &parsed_input.1;
+    let left = parsed_input.0;
+    let right = parsed_input.1;
 
-    left.into_iter().fold(0, |val, &item| {
-        val + (item * (right.iter().filter(|&&y| item == y).count()) as u32)
+    let mut hashmap = HashMap::new();
+
+    left.into_iter().fold(0, |val, item| {
+        let value = hashmap
+            .entry(item)
+            .or_insert(right.iter().filter(|&&y| item == y).count() as u32);
+
+        val + (item * *value)
     })
 }
 
