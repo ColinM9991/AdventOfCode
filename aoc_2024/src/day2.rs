@@ -13,33 +13,15 @@ fn parse_input(input: &str) -> Vec<Vec<u32>> {
 fn solution_1(input: &str) -> usize {
     let input = parse_input(input);
 
-    input
-        .into_iter()
-        .filter(|row| {
-            let is_increasing = row[1] > row[0];
-            for window in row.windows(2) {
-                if window[1] > window[0] && !is_increasing {
-                    return false;
-                }
+    input.into_iter().filter(|row| is_safe(row)).count()
+}
 
-                if window[1] < window[0] && is_increasing {
-                    return false;
-                }
-
-                if window[0] == window[1] {
-                    return false;
-                }
-
-                let diff = window[0].abs_diff(window[1]);
-
-                if diff < 1 || diff > 3 {
-                    return false;
-                }
-            }
-
-            true
-        })
-        .count()
+fn is_safe(row: &[u32]) -> bool {
+    row.windows(2)
+        .all(|row| row[1] > row[0] && row[1].abs_diff(row[0]) <= 3)
+        || row
+            .windows(2)
+            .all(|row| row[1] < row[0] && row[1].abs_diff(row[0]) <= 3)
 }
 
 #[cfg(test)]
